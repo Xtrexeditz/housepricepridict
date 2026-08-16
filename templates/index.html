@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHouse AI - Premium Property Price Prediction Dashboard (INR)</title>
+    <!-- Google Fonts: Outfit for titles, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="glow-container">
+        <div class="glow-circle glow-1"></div>
+        <div class="glow-circle glow-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation / Logo -->
+        <header class="main-header">
+            <div class="logo">
+                <i class="fa-solid fa-house-laptop logo-icon"></i>
+                <span class="logo-text">SmartHouse<span class="logo-accent">AI</span></span>
+            </div>
+            <div class="header-tagline">Machine Learning Valuation Engine (INR)</div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Left Panel: Input controls -->
+            <section class="panel input-panel">
+                <h2 class="panel-title"><i class="fa-solid fa-sliders title-icon"></i> Property Parameters</h2>
+                <form id="prediction-form" class="parameters-form">
+                    
+                    <!-- Property Type Selector Cards -->
+                    <div class="form-group">
+                        <label>Property Type</label>
+                        <div class="property-cards">
+                            <label class="pt-card active">
+                                <input type="radio" name="PropertyType" value="Apartment" checked class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-building"></i>
+                                    <span class="card-label">Apartment</span>
+                                    <span class="card-desc">Multi-family</span>
+                                </div>
+                            </label>
+                            <label class="pt-card">
+                                <input type="radio" name="PropertyType" value="Independent House" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-house"></i>
+                                    <span class="card-label">House</span>
+                                    <span class="card-desc">Stand-alone</span>
+                                </div>
+                            </label>
+                            <label class="pt-card">
+                                <input type="radio" name="PropertyType" value="Villa" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-hotel"></i>
+                                    <span class="card-label">Villa</span>
+                                    <span class="card-desc">Luxury Estate</span>
+                                </div>
+                            </label>
+                            <label class="pt-card">
+                                <input type="radio" name="PropertyType" value="Penthouse" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-cloud-sun"></i>
+                                    <span class="card-label">Penthouse</span>
+                                    <span class="card-desc">Top Floor Sky</span>
+                                </div>
+                            </label>
+                            <label class="pt-card">
+                                <input type="radio" name="PropertyType" value="Agricultural Land" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-seedling"></i>
+                                    <span class="card-label">Farmland</span>
+                                    <span class="card-desc">Field (Acres)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Square Footage / Acreage Range Slider -->
+                    <div class="form-group">
+                        <div class="group-header">
+                            <label id="sqft-label" for="sqft-range">Square Footage</label>
+                            <span id="sqft-value" class="value-badge">2,000 sq ft</span>
+                        </div>
+                        <div class="range-container">
+                            <i id="sqft-icon" class="fa-solid fa-ruler-combined slider-icon"></i>
+                            <input type="range" id="sqft-range" name="SquareFeet" min="600" max="5000" step="50" value="2000" class="premium-slider">
+                        </div>
+                    </div>
+
+                    <!-- Grid of Numerical Selectors (Bedrooms, Bathrooms) -->
+                    <div class="form-row" id="bedrooms-bathrooms-row">
+                        <div class="form-group half-width">
+                            <label><i class="fa-solid fa-bed"></i> Bedrooms</label>
+                            <div class="selector-group">
+                                <button type="button" class="btn-select btn-dec">-</button>
+                                <input type="number" id="bedrooms" name="Bedrooms" min="0" max="5" value="3" readonly class="num-input">
+                                <button type="button" class="btn-select btn-inc">+</button>
+                            </div>
+                        </div>
+                        <div class="form-group half-width">
+                            <label><i class="fa-solid fa-bath"></i> Bathrooms</label>
+                            <div class="selector-group">
+                                <button type="button" class="btn-select btn-dec" data-step="0.5">-</button>
+                                <input type="number" id="bathrooms" name="Bathrooms" min="0" max="4" step="0.5" value="2.5" readonly class="num-input">
+                                <button type="button" class="btn-select btn-inc" data-step="0.5">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neighborhood Selector Cards -->
+                    <div class="form-group">
+                        <label>Neighborhood Location</label>
+                        <div class="neighborhood-cards">
+                            <label class="nh-card">
+                                <input type="radio" name="Neighborhood" value="Downtown" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-city"></i>
+                                    <span class="card-label">Downtown</span>
+                                    <span class="card-desc">Urban Center</span>
+                                </div>
+                            </label>
+                            <label class="nh-card active">
+                                <input type="radio" name="Neighborhood" value="Suburban" checked class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-tree-city"></i>
+                                    <span class="card-label">Suburban</span>
+                                    <span class="card-desc">Residential</span>
+                                </div>
+                            </label>
+                            <label class="nh-card">
+                                <input type="radio" name="Neighborhood" value="Rural" class="hidden-radio">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-tree"></i>
+                                    <span class="card-label">Rural</span>
+                                    <span class="card-desc">Countryside</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Year Built and Floors -->
+                    <div class="form-row" id="year-floors-row">
+                        <div class="form-group half-width">
+                            <label for="year-built"><i class="fa-solid fa-calendar"></i> Year Built</label>
+                            <input type="number" id="year-built" name="YearBuilt" min="1950" max="2026" value="2005" class="premium-text-input">
+                        </div>
+                        <div class="form-group half-width">
+                            <label for="floors"><i class="fa-solid fa-layer-group"></i> Floors</label>
+                            <select id="floors" name="Floors" class="premium-select">
+                                <option value="0">0 (Plot Only)</option>
+                                <option value="1">1 Story</option>
+                                <option value="2" selected>2 Stories</option>
+                                <option value="3">3 Stories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Garage Toggle Switch -->
+                    <div class="form-group toggle-group" id="garage-group">
+                        <div class="toggle-info">
+                            <label class="toggle-label"><i class="fa-solid fa-warehouse"></i> Has Garage</label>
+                            <span class="toggle-desc">Adds dedicated parking space value</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="garage" name="Garage" checked value="1">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-predict-glow" id="predict-btn">
+                        <span>Estimate Property Value</span>
+                        <i class="fa-solid fa-circle-nodes animated-nodes"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Panel: Estimation Results -->
+            <section class="panel results-panel">
+                <div class="panel-card-accent"></div>
+                <h2 class="panel-title"><i class="fa-solid fa-chart-line title-icon"></i> Valuation Report</h2>
+                
+                <div class="valuation-display" id="valuation-container">
+                    <!-- Default State -->
+                    <div class="valuation-state default-state active" id="state-default">
+                        <div class="pulsing-radar">
+                            <div class="radar-dot"></div>
+                            <div class="radar-wave"></div>
+                            <i class="fa-solid fa-house-chimney-window display-icon"></i>
+                        </div>
+                        <h3>Ready for Evaluation</h3>
+                        <p>Adjust the sliders and parameters on the left, then click the estimate button to run inference using the trained Random Forest model in Indian Rupees (₹).</p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="valuation-state loading-state" id="state-loading">
+                        <div class="premium-spinner">
+                            <div class="spinner-ring"></div>
+                            <i class="fa-solid fa-robot processing-icon"></i>
+                        </div>
+                        <h3>Analyzing Parameters</h3>
+                        <p>Encoding categorical variables, scaling features, and executing the prediction pipeline...</p>
+                    </div>
+
+                    <!-- Result State -->
+                    <div class="valuation-state result-state" id="state-result">
+                        <div class="glow-value-wrapper">
+                            <div class="value-tag">ESTIMATED MARKET VALUE</div>
+                            <div class="predicted-price" id="predicted-price-text">₹0.00</div>
+                            <div class="price-range" id="price-confidence-interval">₹0 - ₹0</div>
+                        </div>
+
+                        <div class="insights-container">
+                            <div class="insight-item">
+                                <i class="fa-solid fa-circle-check insight-icon positive" id="insight-pt-icon"></i>
+                                <span class="insight-text" id="insight-property-type">Villa premium structural classification active.</span>
+                            </div>
+                            <div class="insight-item">
+                                <i class="fa-solid fa-circle-check insight-icon positive"></i>
+                                <span class="insight-text" id="insight-neighborhood">Located in premium Suburban zone (+ ₹10 Lakhs value).</span>
+                            </div>
+                            <div class="insight-item">
+                                <i class="fa-solid fa-circle-check insight-icon positive" id="insight-garage-icon"></i>
+                                <span class="insight-text" id="insight-garage">Garage inclusion adds standard structural value.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Stats Panel -->
+                <div class="model-metadata">
+                    <div class="meta-title">Model Specifications</div>
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <span class="meta-label">ML Algorithm</span>
+                            <span class="meta-value">Random Forest</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Accuracy (R²)</span>
+                            <span class="meta-value text-glow-green" id="model-accuracy-r2">99.69%</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Cross Validation</span>
+                            <span class="meta-value">5-Fold Split</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Currency Scale</span>
+                            <span class="meta-value">INR (Lakhs/Crores)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>SmartHouse AI • Developed for Data Science Project Demonstration • scikit-learn & Flask backend</p>
+        </footer>
+    </div>
+
+    <!-- Frontend logic scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Slider interaction
+            const sqftSlider = document.getElementById('sqft-range');
+            const sqftValue = document.getElementById('sqft-value');
+            const sqftLabel = document.getElementById('sqft-label');
+            const sqftIcon = document.getElementById('sqft-icon');
+
+            // Format dynamic badge text helper
+            const updateSliderBadge = () => {
+                const activeType = document.querySelector('input[name="PropertyType"]:checked').value;
+                if (activeType === 'Agricultural Land') {
+                    sqftValue.textContent = `${parseFloat(sqftSlider.value).toFixed(1)} Acres`;
+                } else {
+                    const formatted = Number(sqftSlider.value).toLocaleString('en-IN');
+                    sqftValue.textContent = `${formatted} sq ft`;
+                }
+            };
+            
+            sqftSlider.addEventListener('input', updateSliderBadge);
+
+            // Button incrementers for Bedrooms/Bathrooms
+            const setupNumberSelectors = () => {
+                const groups = document.querySelectorAll('.selector-group');
+                groups.forEach(group => {
+                    const input = group.querySelector('input');
+                    const btnDec = group.querySelector('.btn-dec');
+                    const btnInc = group.querySelector('.btn-inc');
+                    const step = parseFloat(btnDec.dataset.step || '1');
+
+                    btnDec.addEventListener('click', () => {
+                        const min = parseFloat(input.min);
+                        let val = parseFloat(input.value);
+                        if (val > min) {
+                            val -= step;
+                            input.value = val;
+                        }
+                    });
+
+                    btnInc.addEventListener('click', () => {
+                        const max = parseFloat(input.max);
+                        let val = parseFloat(input.value);
+                        if (val < max) {
+                            val += step;
+                            input.value = val;
+                        }
+                    });
+                });
+            };
+            setupNumberSelectors();
+
+            // Form Rows for dynamic disable when Farmland is selected
+            const bedsBathsRow = document.getElementById('bedrooms-bathrooms-row');
+            const yearFloorsRow = document.getElementById('year-floors-row');
+            const garageGroup = document.getElementById('garage-group');
+            
+            const bedroomsInput = document.getElementById('bedrooms');
+            const bathroomsInput = document.getElementById('bathrooms');
+            const yearInput = document.getElementById('year-built');
+            const floorsSelect = document.getElementById('floors');
+            const garageCheckbox = document.getElementById('garage');
+
+            // Property type selector cards toggle active class & dynamic disabling
+            const ptCards = document.querySelectorAll('.pt-card');
+            ptCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    ptCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+
+                    const radioInput = card.querySelector('input[type="radio"]');
+                    if (radioInput.value === 'Agricultural Land') {
+                        // Disable controls
+                        bedsBathsRow.classList.add('disabled-control');
+                        yearFloorsRow.classList.add('disabled-control');
+                        garageGroup.classList.add('disabled-control');
+                        
+                        // Set 0 values
+                        bedroomsInput.value = 0;
+                        bathroomsInput.value = 0.0;
+                        yearInput.value = 1950;
+                        floorsSelect.value = 0;
+                        garageCheckbox.checked = false;
+
+                        // Switch slider to Acre scale
+                        sqftLabel.textContent = "Land Area (Acreage)";
+                        sqftIcon.className = "fa-solid fa-wheat-awn slider-icon";
+                        sqftSlider.min = "0.2";
+                        sqftSlider.max = "10.0";
+                        sqftSlider.step = "0.1";
+                        sqftSlider.value = "1.0";
+                    } else {
+                        // Enable controls
+                        bedsBathsRow.classList.remove('disabled-control');
+                        yearFloorsRow.classList.remove('disabled-control');
+                        garageGroup.classList.remove('disabled-control');
+                        
+                        // Restore defaults if previously Land
+                        if (bedroomsInput.value == 0) bedroomsInput.value = 3;
+                        if (bathroomsInput.value == 0) bathroomsInput.value = 2.5;
+                        if (yearInput.value == 1950) yearInput.value = 2005;
+                        if (floorsSelect.value == 0) floorsSelect.value = 2;
+                        garageCheckbox.checked = true;
+
+                        // Switch slider back to SqFt scale
+                        sqftLabel.textContent = "Square Footage";
+                        sqftIcon.className = "fa-solid fa-ruler-combined slider-icon";
+                        sqftSlider.min = "600";
+                        sqftSlider.max = "5000";
+                        sqftSlider.step = "50";
+                        sqftSlider.value = "2000";
+                    }
+                    updateSliderBadge();
+                });
+            });
+
+            // Neighborhood selector cards toggle active class
+            const nhCards = document.querySelectorAll('.nh-card');
+            nhCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    nhCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
+            });
+
+            // State management functions
+            const showState = (stateId) => {
+                const states = ['state-default', 'state-loading', 'state-result'];
+                states.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (id === stateId) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+            };
+
+            // Formatting helper for INR
+            const formatINR = (num) => {
+                return new Intl.NumberFormat('en-IN', {
+                    style: 'currency',
+                    currency: 'INR',
+                    maximumFractionDigits: 0
+                }).format(num);
+            };
+
+            // Form Submit and prediction API invocation
+            const form = document.getElementById('prediction-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                showState('state-loading');
+
+                // Read parameters
+                const rawSize = parseFloat(sqftSlider.value);
+                const propertyType = document.querySelector('input[name="PropertyType"]:checked').value;
+                const bedrooms = parseInt(bedroomsInput.value);
+                const bathrooms = parseFloat(bathroomsInput.value);
+                const neighborhood = document.querySelector('input[name="Neighborhood"]:checked').value;
+                const yearBuilt = parseInt(yearInput.value);
+                const floors = parseInt(floorsSelect.value);
+                const garage = garageCheckbox.checked ? 1 : 0;
+
+                // If Agricultural Land, convert Acres input to SqFt (1 Acre = 43,560 sq ft)
+                let sqft = rawSize;
+                if (propertyType === 'Agricultural Land') {
+                    sqft = rawSize * 43560.0;
+                }
+
+                const payload = {
+                    SquareFeet: sqft,
+                    PropertyType: propertyType,
+                    Bedrooms: bedrooms,
+                    Bathrooms: bathrooms,
+                    Neighborhood: neighborhood,
+                    YearBuilt: yearBuilt,
+                    Floors: floors,
+                    Garage: garage
+                };
+
+                try {
+                    // Trigger prediction endpoint
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        // Display price formatting
+                        const price = data.prediction;
+                        document.getElementById('predicted-price-text').textContent = data.formatted_prediction;
+                        
+                        // Set confidence range based on standard margin (~ ₹1.5 Lakhs)
+                        const lowPrice = Math.max(500000, Math.round((price - 150000) / 1000) * 1000);
+                        const highPrice = Math.round((price + 150000) / 1000) * 1000;
+                        document.getElementById('price-confidence-interval').textContent = 
+                            `Confidence Range: ${formatINR(lowPrice)} - ${formatINR(highPrice)}`;
+                        
+                        // Set dynamic property type insight
+                        const ptText = document.getElementById('insight-property-type');
+                        const ptIcon = document.getElementById('insight-pt-icon');
+                        
+                        ptIcon.className = "fa-solid insight-icon positive";
+                        if (propertyType === 'Apartment') {
+                            ptIcon.classList.add('fa-building');
+                            ptText.innerHTML = 'Apartment classification applied (urban baseline rate).';
+                        } else if (propertyType === 'Independent House') {
+                            ptIcon.classList.add('fa-house');
+                            ptText.innerHTML = 'Independent House standalone valuation applied (<span class="text-glow-green">+ ₹15 Lakhs value</span>).';
+                        } else if (propertyType === 'Villa') {
+                            ptIcon.classList.add('fa-hotel');
+                            ptText.innerHTML = 'Premium Villa luxury structure valuation active (<span class="text-glow-green">+ ₹40 Lakhs value</span>).';
+                        } else if (propertyType === 'Penthouse') {
+                            ptIcon.classList.add('fa-cloud-sun');
+                            ptText.innerHTML = 'Sky Penthouse top-floor premium valuation active (<span class="text-glow-green">+ ₹30 Lakhs value</span>).';
+                        } else if (propertyType === 'Agricultural Land') {
+                            ptIcon.classList.add('fa-seedling');
+                            ptText.innerHTML = 'Agricultural Farmland (Field) plot valuation active (<span style="color: var(--accent-cyan)">~ ₹48 Lakhs per Acre</span> rate).';
+                        }
+
+                        // Set dynamic neighborhood insight labels
+                        const neighborhoodText = document.getElementById('insight-neighborhood');
+                        if (neighborhood === 'Downtown') {
+                            neighborhoodText.innerHTML = 'Located in premium Downtown center area (<span class="text-glow-green">+' + (propertyType === 'Agricultural Land' ? ' ₹35 Lakhs' : ' ₹20 Lakhs') + ' value</span>).';
+                        } else if (neighborhood === 'Suburban') {
+                            neighborhoodText.innerHTML = 'Located in Suburban development zone (<span class="text-glow-green">+' + (propertyType === 'Agricultural Land' ? ' ₹12 Lakhs' : ' ₹8 Lakhs') + ' value</span>).';
+                        } else {
+                            neighborhoodText.innerHTML = 'Located in Rural farming countryside (<span style="color: var(--accent-red)">-' + (propertyType === 'Agricultural Land' ? ' ₹6 Lakhs' : ' ₹12 Lakhs') + ' baseline correction</span>).';
+                        }
+
+                        // Set garage insight labels
+                        const garageText = document.getElementById('insight-garage');
+                        const garageIcon = document.getElementById('insight-garage-icon');
+                        if (propertyType === 'Agricultural Land') {
+                            garageIcon.className = "fa-solid fa-circle-xmark insight-icon";
+                            garageIcon.style.color = "var(--text-muted)";
+                            garageText.innerHTML = 'Interior features are not applicable for farmland fields.';
+                        } else {
+                            garageIcon.className = "fa-solid fa-circle-check insight-icon positive";
+                            garageIcon.style.color = "";
+                            if (garage === 1) {
+                                garageText.innerHTML = 'Garage included (<span class="text-glow-green">+ ₹3 Lakhs value</span> added).';
+                            } else {
+                                garageText.innerHTML = 'No garage structural value added.';
+                            }
+                        }
+
+                        setTimeout(() => {
+                            showState('state-result');
+                        }, 500);
+                    } else {
+                        alert(data.error || 'Server error occurred during prediction.');
+                        showState('state-default');
+                    }
+                } catch (error) {
+                    console.error('Request failed:', error);
+                    alert('Failed to connect to ML Flask server. Make sure it is running.');
+                    showState('state-default');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
